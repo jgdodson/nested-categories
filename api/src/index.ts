@@ -9,7 +9,6 @@ import app from './app';
 const port = config.get<number>('app.port');
 
 app.listen(port, (err) => {
-
   if (err) {
     console.error('Error during server startup:', err);
   }

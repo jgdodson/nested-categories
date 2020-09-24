@@ -8,8 +8,15 @@ import hsts from 'hsts';
 
 import redirect from './middleware/redirect';
 
+import mongoClientPromise from './lib/mongo';
+
 // Routers
-import ExampleRouter from './routes/example';
+import CategoryRouter from './routes/CategoryRouter';
+
+// Models
+import CategoryModel from './models/Category';
+
+const categoryRouter = CategoryRouter(new CategoryModel(mongoClientPromise));
 
 // Instantiate the App
 const app = express();
@@ -73,7 +80,7 @@ app.use(session(session_options));
  *
  * This is where you attach routers for various portions of your API
  */
-app.use('/', ExampleRouter);
+app.use('/category', categoryRouter);
 
 // Serve static files in production
 if (config.get('app.serveStaticBuild')) {
