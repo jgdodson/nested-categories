@@ -11,3 +11,12 @@ services:
     working_dir: /usr/app
     volumes:
       - '.:/usr/app'
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:3.6
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass123

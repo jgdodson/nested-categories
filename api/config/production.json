@@ -23,5 +23,10 @@
   },
   "oauth": {
     "callbackURL": "https://www.ezpenpal.com/auth/google/callback"
+  },
+  "mongo": {
+    "host": "",
+    "user": "",
+    "pass": ""
   }
 }

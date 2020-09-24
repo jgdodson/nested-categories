@@ -8,6 +8,11 @@ import app from './app';
 
 const port = config.get<number>('app.port');
 
-console.log(`server listening on port [${port}]`);
+app.listen(port, (err) => {
 
-app.listen(port);
+  if (err) {
+    console.error('Error during server startup:', err);
+  }
+
+  console.log(`server listening on port [${port}]`);
+});

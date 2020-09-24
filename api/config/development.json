@@ -23,5 +23,10 @@
   },
   "oauth": {
     "callbackURL": "http://localhost:4000/auth/google/callback"
+  },
+  "mongo": {
+    "host": "mongo_db",
+    "user": "root",
+    "pass": "pass123"
   }
 }
