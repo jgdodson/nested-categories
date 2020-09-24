@@ -33,12 +33,44 @@ class ProductModel {
     return newProduct;
   }
 
-  async update() {}
+  /**
+   * Update a product
+   *
+   * @param productId
+   * @param updates
+   */
+  async update(productId: ObjectId, updates: { price?: number; description?: string }) {
+    const collection = (await this.mongo).db('heady').collection('product');
+
+    const updatedResult = await collection.findOneAndUpdate(
+      {
+        _id: productId,
+      },
+      {
+        $set: updates,
+      },
+      {
+        returnOriginal: false,
+      },
+    );
+
+    return updatedResult.value;
+  }
 
   /**
    * Get all products in a category
    */
-  async getAllInCategory(category) {}
+  async getAll(category: ObjectId) {
+    const collection = (await this.mongo).db('heady').collection('product');
+
+    const products = await collection
+      .find({
+        categories: category,
+      })
+      .toArray();
+
+    return products;
+  }
 }
 
 export default ProductModel;

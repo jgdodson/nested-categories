@@ -6,17 +6,21 @@ import body_parser from 'body-parser';
 import path from 'path';
 import hsts from 'hsts';
 
+// Local imports
 import redirect from './middleware/redirect';
-
 import mongoClientPromise from './lib/mongo';
 
-// Routers
+// Import Routers
 import CategoryRouter from './routes/CategoryRouter';
+import ProductRouter from './routes/ProductRouter';
 
-// Models
+// Import Models
 import CategoryModel from './models/Category';
+import ProductModel from './models/Product';
 
+// Router instances
 const categoryRouter = CategoryRouter(new CategoryModel(mongoClientPromise));
+const productRouter = ProductRouter(new ProductModel(mongoClientPromise));
 
 // Instantiate the App
 const app = express();
@@ -44,7 +48,6 @@ app.use(
 );
 
 app.use(body_parser.json());
-app.use(body_parser.urlencoded({ extended: false }));
 
 const RedisStore = connect_redis(session);
 
@@ -81,6 +84,7 @@ app.use(session(session_options));
  * This is where you attach routers for various portions of your API
  */
 app.use('/category', categoryRouter);
+app.use('/product', productRouter);
 
 // Serve static files in production
 if (config.get('app.serveStaticBuild')) {

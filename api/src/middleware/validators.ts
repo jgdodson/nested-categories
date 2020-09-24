@@ -44,20 +44,7 @@ const user = {
     .withMessage('Your bio cannot be longer than 2048 characters'),
 };
 
-/**
- * Validators for message-related data
- *
- * @type {{text: ValidationChain, recip_id: ValidationChain, lon: ValidationChain, lat: ValidationChain}}
- */
-const message = {
-  text: checkAPI.body('text').exists().not().isEmpty().withMessage('Invalid message body'),
 
-  recip_id: checkAPI.body('recip_id').exists().isInt({ min: 0 }).toInt().withMessage('Invalid recipient ID'),
-
-  lon: checkAPI.body('lon').optional().isFloat({ min: -180, max: 180 }).toFloat(),
-
-  lat: checkAPI.body('lat').optional().isFloat({ min: -90, max: 90 }).toFloat(),
-};
 
 function handleErrors(req: Request, res: Response, next: NextFunction): void {
   const errors = checkAPI.validationResult(req);
@@ -71,6 +58,5 @@ function handleErrors(req: Request, res: Response, next: NextFunction): void {
 
 export default {
   user,
-  message,
   handleErrors,
 };
