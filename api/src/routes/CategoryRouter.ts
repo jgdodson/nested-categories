@@ -24,8 +24,13 @@ function CategoryRouterFactory(categoryModel: CategoryModel): Router {
   router.post(
     '/',
 
+    // Name of the new category
     body('name').isLength({ min: 1 }).exists(),
-    body('parentId').isLength({ min: 1 }).optional(),
+
+    // Optional objectId of an existing category to serve as parent for new category
+    validators.isObjectIdHex(body('parentId')).optional(),
+
+    // Validate input
     validators.handleErrors,
 
     async (req, res) => {

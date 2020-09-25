@@ -68,14 +68,16 @@ class ProductModel {
    *
    * @param category
    */
-  async getAll(category: ObjectId) {
-    const products = await this.collection
-      .find({
-        categories: category,
-      })
-      .toArray();
-
-    return products;
+  async getAll(category?: ObjectId) {
+    if (category) {
+      return this.collection
+        .find({
+          categories: category,
+        })
+        .toArray();
+    } else {
+      return this.collection.find().toArray();
+    }
   }
 }
 

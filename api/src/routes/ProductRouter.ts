@@ -15,14 +15,16 @@ function ProductRouterFactory(productModel: ProductModel): Router {
   router.get(
     '/',
 
-    query('category').exists(),
+    // ObjectId of an existing category
+    validators.isObjectIdHex(query('category')).optional(),
 
+    // Validate input
     validators.handleErrors,
 
     async (req, res) => {
       const params = matchedData(req);
 
-      const categoryId = new ObjectId(params.category);
+      const categoryId = params.category ? new ObjectId(params.category) : undefined;
 
       const categories = await productModel.getAll(categoryId);
 
@@ -36,10 +38,16 @@ function ProductRouterFactory(productModel: ProductModel): Router {
   router.patch(
     '/:productId',
 
-    param('productId').exists(),
-    body('price').optional(),
-    body('description').optional(),
+    // ObjectId of existing product
+    validators.isObjectIdHex(param('productId')).exists(),
 
+    // New product price
+    validators.product.price(body('price')).optional(),
+
+    // New product description
+    validators.product.description(body('description')).optional(),
+
+    // Validate input
     validators.handleErrors,
 
     async (req, res) => {
@@ -50,6 +58,7 @@ function ProductRouterFactory(productModel: ProductModel): Router {
 
       const updatedProduct = await productModel.update(productId, updateFields);
 
+      // Send the updated product object
       res.json(updatedProduct);
     },
   );
@@ -60,23 +69,29 @@ function ProductRouterFactory(productModel: ProductModel): Router {
   router.post(
     '/',
 
-    body('name').isLength({ min: 1 }).exists(),
-    body('price').isNumeric().toFloat().exists(),
-    body('description').isLength({ min: 1 }).exists(),
-    body('categories').exists(),
+    // Product name
+    validators.product.name(body('name')).exists(),
 
+    // Product price
+    validators.product.price(body('price')).exists(),
+
+    // Product description
+    validators.product.description(body('description')).exists(),
+
+    // Product categories
+    validators.product.categories(body('categories')).exists(),
+
+    // Validate input
     validators.handleErrors,
 
     async (req, res) => {
       const params = matchedData(req);
 
-      console.log(req.body);
-      console.log(params);
-
       const categoryObjectIds = params.categories.map((category) => new ObjectId(category));
 
       const product = await productModel.create(params.name, params.price, params.description, categoryObjectIds);
 
+      // Send the new product object
       res.json(product);
     },
   );

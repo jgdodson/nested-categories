@@ -1,50 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 
-import checkAPI from 'express-validator/check';
+import checkAPI, { ValidationChain } from 'express-validator/check';
 
-/**
- * Validators for user-related data
- * @type {{user_id: ValidationChain, email: ValidationChain, password: ValidationChain, username: ValidationChain, first_name: ValidationChain, last_name: ValidationChain, bio: ValidationChain, country: ValidationChain, current_country: ValidationChain}}
- */
-const user = {
-  user_id: checkAPI.body('user_id').exists().isInt({ min: 0 }).toInt().withMessage('Invalid user ID'),
+function isObjectIdHex(vc: ValidationChain): ValidationChain {
+  return vc.isHexadecimal().isLength({ min: 24, max: 24 });
+}
 
-  email: checkAPI.body('email').exists().trim().isEmail().normalizeEmail().withMessage('Must be a valid email'),
+const product = {
+  name: function (vc: ValidationChain): ValidationChain {
+    return vc.isLength({ min: 1 });
+  },
 
-  password: checkAPI
-    .body('password')
-    .exists()
-    .matches(/^\S{8,20}$/)
-    .withMessage('Between 8 and 20 characters, no spaces.'),
+  price: function (vc: ValidationChain): ValidationChain {
+    return vc.isFloat().toFloat();
+  },
 
-  username: checkAPI
-    .body('username')
-    .exists()
-    .trim()
-    .matches(/^[\w\d]{5,20}$/)
-    .withMessage('Between 5 and 20 letters and digits'),
+  description: function (vc: ValidationChain): ValidationChain {
+    return vc.isLength({ min: 1 });
+  },
 
-  first_name: checkAPI
-    .body('first_name')
-    .trim()
-    .matches(/^[\w]{0,20}$/)
-    .withMessage('Between 0 and 20 letters'),
-
-  last_name: checkAPI
-    .body('last_name')
-    .trim()
-    .matches(/^[\w]{0,30}$/)
-    .withMessage('Between 1 and 30 letters'),
-
-  bio: checkAPI
-    .body('bio')
-    .exists()
-    .isLength({ min: 0, max: 2048 })
-    .trim()
-    .withMessage('Your bio cannot be longer than 2048 characters'),
+  categories: function (vc: ValidationChain): ValidationChain {
+    return vc.isArray();
+  },
 };
-
-
 
 function handleErrors(req: Request, res: Response, next: NextFunction): void {
   const errors = checkAPI.validationResult(req);
@@ -57,6 +35,7 @@ function handleErrors(req: Request, res: Response, next: NextFunction): void {
 }
 
 export default {
-  user,
+  isObjectIdHex,
+  product,
   handleErrors,
 };
