@@ -4,14 +4,26 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import config from 'config';
-import app from './app';
+import AppFactory from './app';
+
+import mongoClientPromise from './lib/mongo';
 
 const port = config.get<number>('app.port');
 
-app.listen(port, (err) => {
-  if (err) {
-    console.error('Error during server startup:', err);
-  }
+mongoClientPromise
+  .then((mongoClient) => {
+    const app = AppFactory(mongoClient);
 
-  console.log(`server listening on port [${port}]`);
-});
+    app.listen(port, (err) => {
+      if (err) {
+        console.error('Error during server startup:', err);
+        return;
+      }
+
+      console.log(`server listening on port [${port}]`);
+    });
+  })
+  .catch((err) => {
+    console.error('Error while connecting to mongo', err);
+    return;
+  });

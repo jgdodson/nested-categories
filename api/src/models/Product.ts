@@ -1,20 +1,28 @@
-import { ObjectId } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 
 class ProductModel {
-  mongo;
+  // MongoClient object used by this model
+  private readonly mongo: MongoClient;
 
-  constructor(mongo) {
+  // Collection object used by this model
+  private readonly collection: Collection;
+
+  constructor(mongo: MongoClient) {
     this.mongo = mongo;
+    this.collection = mongo.db('heady').collection('product');
   }
 
   /**
    * Create a product
+   *
+   * @param name
+   * @param price
+   * @param description
+   * @param categories
    */
   async create(name: string, price: number, description: string, categories: Array<ObjectId>) {
-    const collection = (await this.mongo).db('heady').collection('product');
-
     // Insert new category
-    const writeResult = await collection.insertOne({
+    const writeResult = await this.collection.insertOne({
       name,
       price,
       description,
@@ -40,9 +48,7 @@ class ProductModel {
    * @param updates
    */
   async update(productId: ObjectId, updates: { price?: number; description?: string }) {
-    const collection = (await this.mongo).db('heady').collection('product');
-
-    const updatedResult = await collection.findOneAndUpdate(
+    const updateResult = await this.collection.findOneAndUpdate(
       {
         _id: productId,
       },
@@ -54,16 +60,16 @@ class ProductModel {
       },
     );
 
-    return updatedResult.value;
+    return updateResult.value;
   }
 
   /**
    * Get all products in a category
+   *
+   * @param category
    */
   async getAll(category: ObjectId) {
-    const collection = (await this.mongo).db('heady').collection('product');
-
-    const products = await collection
+    const products = await this.collection
       .find({
         categories: category,
       })

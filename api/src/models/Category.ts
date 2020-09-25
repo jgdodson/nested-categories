@@ -1,20 +1,21 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 
 class CategoryModel {
-  private readonly mongo: Promise<MongoClient>;
+  private readonly mongo: MongoClient;
 
-  constructor(mongo) {
+  private readonly collection: Collection;
+
+  constructor(mongo: MongoClient) {
     this.mongo = mongo;
+    this.collection = mongo.db('heady').collection('category');
   }
 
   /**
    * Create a category with optional parent category
    */
   async create(name: string, parentId: ObjectId) {
-    const collection = (await this.mongo).db('heady').collection('category');
-
     // Insert new category
-    const writeResult = await collection.insertOne({
+    const writeResult = await this.collection.insertOne({
       name,
       children: [],
     });
@@ -30,7 +31,7 @@ class CategoryModel {
 
     // Update the parent category if specified
     if (parentId) {
-      await collection.updateOne(
+      await this.collection.updateOne(
         { _id: parentId },
         {
           $addToSet: {
@@ -47,11 +48,9 @@ class CategoryModel {
    * Get all categories, with child category mapping
    */
   async getAll(): Promise<any> {
-    const collection = (await this.mongo).db('heady').collection('category');
+    const categories = await this.collection.find().toArray();
 
-    const records = await collection.find().toArray();
-
-    return records;
+    return categories;
   }
 }
 
