@@ -18,6 +18,15 @@ npm install
 npm run dev
 ```
 
+You can play with the endpoints manually or run the demo script
+to see all of the CRUD operations used. After starting the dev server,
+open up another terminal and run the following
+
+```bash
+cd api
+npm run demo
+```
+
 ## API
 
  `POST /category` - add a category
